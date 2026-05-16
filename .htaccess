@@ -1,0 +1,48 @@
+# Deny access to sensitive files
+<FilesMatch "\.(env|json|php\.bak|log)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order Allow,Deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# Deny access to hidden files (starting with .)
+<FilesMatch "^\.">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order Allow,Deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# Disable directory listing
+Options -Indexes
+
+# Prevent access to config and data directories via rewrite
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^config/ - [F,L]
+    RewriteRule ^data/ - [F,L]
+</IfModule>
+
+# Security headers
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "DENY"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "no-referrer"
+    Header set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'"
+</IfModule>
+
+# Limit upload size (100MB)
+<IfModule mod_php.c>
+    php_value upload_max_filesize 100M
+    php_value post_max_size 105M
+    php_value max_execution_time 300
+    php_value max_input_time 300
+</IfModule>

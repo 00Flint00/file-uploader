@@ -1,0 +1,17 @@
+# Deny all direct access to uploaded files
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order Allow,Deny
+    Deny from all
+</IfModule>
+
+# Disable PHP execution in uploads directory
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+
+# Disable script execution
+Options -ExecCGI
+RemoveHandler .php .php3 .php4 .php5 .phtml .pl .py .cgi
