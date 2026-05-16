@@ -1,11 +1,65 @@
 (() => {
     'use strict';
 
+    // Translations
+    const i18n = {
+        en: {
+            passwordTitle: 'Access Required',
+            passwordSubtitle: 'Please enter the upload password',
+            passwordPlaceholder: 'Enter password',
+            passwordBtn: 'Request Access',
+            togglePasswordLabel: 'Show password',
+            passwordEmpty: 'Please enter a password',
+            passwordWrong: 'Wrong password or expired',
+            passwordConnError: 'Connection error. Please try again.',
+            passwordChecking: 'Checking...',
+            uploadTitle: 'File Upload',
+            uploadSubtitle: 'Drag files here or click to browse',
+            dropText: 'Drag files here or <span>browse</span>',
+            dropHint: 'All file types allowed \u2014 No compression',
+            uploadBtn: 'Upload',
+            clearBtn: 'Clear all',
+            uploading: 'Uploading...',
+            uploadSuccess: 'All files uploaded successfully!',
+            uploadFailed: 'Upload failed',
+            sessionExpired: 'Session expired. Please reload the page.',
+            networkError: 'Network error',
+            invalidResponse: 'Invalid server response',
+            removeTitle: 'Remove',
+        },
+        de: {
+            passwordTitle: 'Zugang erforderlich',
+            passwordSubtitle: 'Bitte gib das Upload-Passwort ein',
+            passwordPlaceholder: 'Passwort eingeben',
+            passwordBtn: 'Zugang anfordern',
+            togglePasswordLabel: 'Passwort anzeigen',
+            passwordEmpty: 'Bitte Passwort eingeben',
+            passwordWrong: 'Falsches Passwort oder abgelaufen',
+            passwordConnError: 'Verbindungsfehler. Bitte erneut versuchen.',
+            passwordChecking: 'Pr\u00fcfe...',
+            uploadTitle: 'Datei-Upload',
+            uploadSubtitle: 'Ziehe Dateien hierher oder klicke zum Ausw\u00e4hlen',
+            dropText: 'Dateien hierher ziehen oder <span>durchsuchen</span>',
+            dropHint: 'Alle Dateitypen erlaubt \u2014 Keine Komprimierung',
+            uploadBtn: 'Hochladen',
+            clearBtn: 'Alle entfernen',
+            uploading: 'Hochladen...',
+            uploadSuccess: 'Alle Dateien erfolgreich hochgeladen!',
+            uploadFailed: 'Upload fehlgeschlagen',
+            sessionExpired: 'Sitzung abgelaufen. Bitte Seite neu laden.',
+            networkError: 'Netzwerkfehler',
+            invalidResponse: 'Ung\u00fcltige Server-Antwort',
+            removeTitle: 'Entfernen',
+        },
+    };
+
     // State
     let uploadToken = '';
     let selectedFiles = [];
+    let currentLang = 'en';
 
     // DOM Elements
+    const languageOverlay = document.getElementById('languageOverlay');
     const overlay = document.getElementById('passwordOverlay');
     const passwordInput = document.getElementById('passwordInput');
     const passwordForm = document.getElementById('passwordForm');
@@ -25,10 +79,44 @@
     const progressText = document.getElementById('progressText');
     const statusMessage = document.getElementById('statusMessage');
 
-    // Initialize
-    function init() {
+    // Translation helper
+    function t(key) {
+        return i18n[currentLang][key] || i18n.en[key] || key;
+    }
+
+    function applyTranslations() {
+        document.getElementById('htmlRoot').lang = currentLang;
+
+        document.querySelectorAll('[data-i18n]').forEach((el) => {
+            el.textContent = t(el.dataset.i18n);
+        });
+        document.querySelectorAll('[data-i18n-html]').forEach((el) => {
+            el.innerHTML = t(el.dataset.i18nHtml);
+        });
+        document.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
+            el.placeholder = t(el.dataset.i18nPlaceholder);
+        });
+        document.querySelectorAll('[data-i18n-aria]').forEach((el) => {
+            el.setAttribute('aria-label', t(el.dataset.i18nAria));
+        });
+    }
+
+    // Language selection
+    function handleLanguageSelect(lang) {
+        currentLang = lang;
+        applyTranslations();
+        languageOverlay.classList.remove('active');
         overlay.classList.add('active');
         passwordInput.focus();
+    }
+
+    // Initialize
+    function init() {
+        languageOverlay.classList.add('active');
+
+        // Language buttons
+        document.getElementById('langEn').addEventListener('click', () => handleLanguageSelect('en'));
+        document.getElementById('langDe').addEventListener('click', () => handleLanguageSelect('de'));
 
         // Password form
         passwordForm.addEventListener('submit', handlePasswordSubmit);
@@ -52,7 +140,7 @@
         const password = passwordInput.value.trim();
 
         if (!password) {
-            showPasswordError('Bitte Passwort eingeben');
+            showPasswordError(t('passwordEmpty'));
             return;
         }
 
@@ -73,12 +161,12 @@
                 overlay.classList.remove('active');
                 uploadContainer.classList.add('active');
             } else {
-                showPasswordError(data.error || 'Falsches Passwort');
+                showPasswordError(data.error || t('passwordWrong'));
                 passwordInput.value = '';
                 passwordInput.focus();
             }
         } catch {
-            showPasswordError('Verbindungsfehler. Bitte erneut versuchen.');
+            showPasswordError(t('passwordConnError'));
         } finally {
             setPasswordLoading(false);
         }
@@ -103,8 +191,8 @@
     function setPasswordLoading(loading) {
         passwordBtn.disabled = loading;
         passwordBtn.innerHTML = loading
-            ? '<div class="spinner"></div> Prüfe...'
-            : 'Zugang anfordern';
+            ? '<div class="spinner"></div> ' + t('passwordChecking')
+            : t('passwordBtn');
     }
 
     // Drag & Drop
@@ -150,7 +238,6 @@
             if (entry.isFile) {
                 return new Promise((resolve) => {
                     entry.file((file) => {
-                        // Preserve relative path for folder uploads
                         const relativePath = path ? path + '/' + file.name : file.name;
                         Object.defineProperty(file, 'relativePath', {
                             value: relativePath,
@@ -196,7 +283,6 @@
     // File management
     function addFiles(files) {
         for (const file of files) {
-            // Avoid duplicates
             const exists = selectedFiles.some(
                 (f) => f.name === file.name && f.size === file.size
             );
@@ -241,7 +327,7 @@
                     <div class="file-name" title="${escapeHtml(file.relativePath || file.name)}">${escapeHtml(file.relativePath || file.name)}</div>
                     <div class="file-size">${formatFileSize(file.size)}</div>
                 </div>
-                <button class="file-remove" onclick="window.__removeFile(${index})" title="Entfernen">
+                <button class="file-remove" onclick="window.__removeFile(${index})" title="${t('removeTitle')}">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="18" y1="6" x2="6" y2="18"/>
                         <line x1="6" y1="6" x2="18" y2="18"/>
@@ -282,7 +368,7 @@
                 if (e.lengthComputable) {
                     const percent = Math.round((e.loaded / e.total) * 100);
                     progressFill.style.width = percent + '%';
-                    progressText.textContent = `${percent}% — ${formatFileSize(e.loaded)} / ${formatFileSize(e.total)}`;
+                    progressText.textContent = `${percent}% \u2014 ${formatFileSize(e.loaded)} / ${formatFileSize(e.total)}`;
                 }
             });
 
@@ -291,21 +377,21 @@
                     try {
                         resolve(JSON.parse(xhr.responseText));
                     } catch {
-                        reject(new Error('Ungültige Server-Antwort'));
+                        reject(new Error(t('invalidResponse')));
                     }
                 };
-                xhr.onerror = () => reject(new Error('Netzwerkfehler'));
+                xhr.onerror = () => reject(new Error(t('networkError')));
                 xhr.open('POST', 'api/upload.php');
                 xhr.send(formData);
             });
 
             if (result.success) {
-                showStatus('success', result.message || 'Alle Dateien erfolgreich hochgeladen!');
+                showStatus('success', result.message || t('uploadSuccess'));
                 selectedFiles = [];
                 renderFileList();
                 updateActions();
             } else {
-                let errorMsg = result.message || 'Upload fehlgeschlagen';
+                let errorMsg = result.message || t('uploadFailed');
                 if (result.results) {
                     const failed = result.results.filter((r) => !r.success);
                     if (failed.length > 0) {
@@ -316,9 +402,9 @@
             }
         } catch (err) {
             if (err.message.includes('Token') || err.message.includes('401')) {
-                showStatus('error', 'Sitzung abgelaufen. Bitte Seite neu laden.');
+                showStatus('error', t('sessionExpired'));
             } else {
-                showStatus('error', err.message || 'Upload fehlgeschlagen');
+                showStatus('error', err.message || t('uploadFailed'));
             }
         } finally {
             setUploading(false);
@@ -332,10 +418,10 @@
 
         if (uploading) {
             progressFill.style.width = '0%';
-            progressText.textContent = 'Wird hochgeladen...';
-            uploadBtn.innerHTML = '<div class="spinner"></div> Hochladen...';
+            progressText.textContent = t('uploading');
+            uploadBtn.innerHTML = '<div class="spinner"></div> ' + t('uploading');
         } else {
-            uploadBtn.innerHTML = 'Hochladen';
+            uploadBtn.innerHTML = t('uploadBtn');
         }
     }
 

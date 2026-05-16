@@ -50,6 +50,63 @@ body {
     padding: 1rem;
 }
 
+/* === Language Selector === */
+.language-modal {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+    transform: translateY(20px) scale(0.95);
+    transition: transform 0.3s ease;
+}
+
+.overlay.active .language-modal {
+    transform: translateY(0) scale(1);
+}
+
+.language-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.btn-lang {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.5rem 1rem;
+    background: var(--bg-input);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.btn-lang:hover {
+    border-color: var(--accent);
+    background: rgba(124, 92, 252, 0.08);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px var(--accent-glow);
+}
+
+.btn-lang:active {
+    transform: scale(0.97);
+}
+
+.lang-flag {
+    font-size: 2.5rem;
+    line-height: 1;
+}
+
 /* === Overlay (Password Popup) === */
 .overlay {
     position: fixed;

@@ -1,13 +1,37 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" id="htmlRoot">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title>Datei-Upload</title>
+    <title>File Upload</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+
+    <!-- Language Selector Overlay -->
+    <div class="overlay" id="languageOverlay">
+        <div class="language-modal">
+            <div class="modal-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="2" y1="12" x2="22" y2="12"/>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                </svg>
+            </div>
+            <h2 class="modal-title">Choose Language / Sprache wählen</h2>
+            <div class="language-buttons">
+                <button class="btn btn-lang" id="langEn" data-lang="en">
+                    <span class="lang-flag">🇬🇧</span>
+                    <span>English</span>
+                </button>
+                <button class="btn btn-lang" id="langDe" data-lang="de">
+                    <span class="lang-flag">🇩🇪</span>
+                    <span>Deutsch</span>
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Password Overlay -->
     <div class="overlay" id="passwordOverlay">
@@ -18,25 +42,26 @@
                     <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
                 </svg>
             </div>
-            <h2 class="modal-title">Zugang erforderlich</h2>
-            <p class="modal-subtitle">Bitte gib das Upload-Passwort ein</p>
+            <h2 class="modal-title" data-i18n="passwordTitle">Zugang erforderlich</h2>
+            <p class="modal-subtitle" data-i18n="passwordSubtitle">Bitte gib das Upload-Passwort ein</p>
             <form id="passwordForm" autocomplete="off">
                 <div class="input-group">
                     <input
                         type="password"
                         id="passwordInput"
                         placeholder="Passwort eingeben"
+                        data-i18n-placeholder="passwordPlaceholder"
                         autocomplete="off"
                         required
                     >
-                    <button type="button" class="toggle-password" id="togglePassword" aria-label="Passwort anzeigen">
+                    <button type="button" class="toggle-password" id="togglePassword" aria-label="Show password" data-i18n-aria="togglePasswordLabel">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                             <circle cx="12" cy="12" r="3"/>
                         </svg>
                     </button>
                 </div>
-                <button type="submit" class="btn btn-primary" id="passwordBtn">
+                <button type="submit" class="btn btn-primary" id="passwordBtn" data-i18n="passwordBtn">
                     Zugang anfordern
                 </button>
                 <p class="modal-error" id="passwordError"></p>
@@ -47,8 +72,8 @@
     <!-- Upload Area (hidden until authenticated) -->
     <div class="upload-container" id="uploadContainer">
         <div class="upload-header">
-            <h1>Datei-Upload</h1>
-            <p>Ziehe Dateien hierher oder klicke zum Auswählen</p>
+            <h1 data-i18n="uploadTitle">Datei-Upload</h1>
+            <p data-i18n="uploadSubtitle">Ziehe Dateien hierher oder klicke zum Auswählen</p>
         </div>
 
         <!-- Status Message -->
@@ -71,8 +96,8 @@
                     <line x1="12" y1="3" x2="12" y2="15"/>
                 </svg>
             </div>
-            <p class="drop-zone-text">Dateien hierher ziehen oder <span>durchsuchen</span></p>
-            <p class="drop-zone-hint">Alle Dateitypen erlaubt — Keine Komprimierung</p>
+            <p class="drop-zone-text" data-i18n-html="dropText">Dateien hierher ziehen oder <span>durchsuchen</span></p>
+            <p class="drop-zone-hint" data-i18n="dropHint">Alle Dateitypen erlaubt — Keine Komprimierung</p>
         </div>
 
         <!-- Hidden File Input -->
@@ -83,8 +108,8 @@
 
         <!-- Upload Actions -->
         <div class="upload-actions" id="uploadActions" style="display: none;">
-            <button class="btn btn-primary" id="uploadBtn">Hochladen</button>
-            <button class="btn btn-secondary" id="clearBtn">Alle entfernen</button>
+            <button class="btn btn-primary" id="uploadBtn" data-i18n="uploadBtn">Hochladen</button>
+            <button class="btn btn-secondary" id="clearBtn" data-i18n="clearBtn">Alle entfernen</button>
         </div>
     </div>
 
